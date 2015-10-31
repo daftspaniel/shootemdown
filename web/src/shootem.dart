@@ -44,8 +44,7 @@ class ShootEmDown {
 
   /// Game initialisation
   ShootEmDown() {
-    sounds.load('fire', 'snd/1.wav');
-    sounds.load('hurt', 'snd/hurt.wav');
+    sounds..load('fire', 'snd/1.wav')..load('hurt', 'snd/hurt.wav');
 
     playerShip = game.createSprite("img/ship.png", 48, 48);
     playerShip.setDyingImage("img/hitship.png");
@@ -73,6 +72,7 @@ class ShootEmDown {
     bool reverse = false;
     invaders.sprites.forEach((Sprite inv) {
       if (inv.x > 600 || inv.x < 0) reverse = true;
+      if (inv.y < -50) inv.alive = false;
     });
     if (reverse) {
       invaders.sprites.forEach((Sprite inv) {
@@ -114,15 +114,14 @@ class ShootEmDown {
     invaders.removeDead();
     goodBullets.removeDead();
     badBullets.removeDead();
-
-    if (playerShip.dying || !playerShip.alive){
-      if(game.player.isReadyToRespawn())
-      {
-        playerShip..dying = false
-                  ..alive = true;
-        game.spriteGroup.add(playerShip);
-        print("Respawn!");
-        //game.player.sprite = playerShip;
+    print(invaders.length);
+    if (playerShip.dying || !playerShip.alive) {
+      if (game.player.isReadyToRespawn()) {
+        playerShip
+          ..dying = false
+          ..alive = true;
+        game.spriteGroup
+            .add(playerShip); // SpriteGroup update removes dead sprites.
       }
     }
 
@@ -170,6 +169,7 @@ class ShootEmDown {
     });
   }
 
+  /// Update the HTML page the the game status.
   void updateScorePanel(Player p1) {
     DivElement statusPanel = querySelector("#gameStatus");
     statusPanel.innerHtml = "Score : ${p1.score} Lives ${p1.lives}";
