@@ -1,6 +1,7 @@
 import 'package:simplegamelib/simplegamelib.dart';
 import 'dart:html';
 import 'dart:math';
+import 'starfield.dart';
 
 /// Core class for left-right shooter game.
 class ShootEmDown {
@@ -10,8 +11,10 @@ class ShootEmDown {
   SpriteGroup invaders;
   SpriteGroup goodBullets;
   SpriteGroup badBullets;
-  AudioBank sounds = new AudioBank();
+  final AudioBank sounds = new AudioBank();
   final _random = new Random();
+  Starfield stars;
+  Starfield starsMid;
 
   /// Create a crowd of invaders.
   buildMob() {
@@ -46,11 +49,10 @@ class ShootEmDown {
 
   /// Game initialisation
   ShootEmDown() {
-    sounds..load('fire', 'snd/1.wav')..load('hurt', 'snd/hurt.wav');
-
     playerShip = game.createSprite("img/ship.png", 24, 20);
     playerShip.setDyingImage("img/hitship.png");
 
+    sounds..load('fire', 'snd/1.wav')..load('hurt', 'snd/hurt.wav');
     game
       ..renderer.liveBackground.color = "#000000"
       ..renderer.limits = new Rectangle(0, 0, 640, 480)
@@ -61,6 +63,9 @@ class ShootEmDown {
     setUpKeys();
     resetPlayer();
     game.customUpdate = update;
+    stars = new Starfield(0, 0, 640, 480, 33, 2, game.renderer.canvas);
+    starsMid = new Starfield(0, 0, 640, 480, 23, 3, game.renderer.canvas);
+    game.renderer.liveBackground.postCustomDraw = this.postCustomDraw;
 
     // Level 1.
     buildMob();
@@ -193,5 +198,11 @@ class ShootEmDown {
     DivElement statusPanel = querySelector("#gameStatus");
     int lives = max(p1.lives, 0);
     statusPanel.innerHtml = "Score : ${p1.score} Lives ${lives}";
+  }
+
+  /// Draw the [Starfield].
+  void postCustomDraw(CanvasRenderingContext2D canvas) {
+    stars.draw();
+    starsMid.draw();
   }
 }
