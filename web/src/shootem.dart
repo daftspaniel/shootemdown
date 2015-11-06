@@ -19,9 +19,11 @@ class ShootEmDown {
     goodBullets = new SpriteGroup();
     badBullets = new SpriteGroup();
 
+    Sprite inv;
     for (int k = 0; k < 4; k++) {
       for (int i = 0; i < 9; i++) {
-        Sprite inv = game.createSprite("img/inv1.png", 48, 48);
+        if (k % 2 == 0) inv = game.createSprite("img/inv1.png", 48, 48);
+        else inv = game.createSprite("img/inv2.png", 48, 48);
         inv.setDyingImage("img/hitinv1.png");
         invaders.add(inv);
 
@@ -46,7 +48,7 @@ class ShootEmDown {
   ShootEmDown() {
     sounds..load('fire', 'snd/1.wav')..load('hurt', 'snd/hurt.wav');
 
-    playerShip = game.createSprite("img/ship.png", 48, 48);
+    playerShip = game.createSprite("img/ship.png", 24, 20);
     playerShip.setDyingImage("img/hitship.png");
 
     game
@@ -100,28 +102,45 @@ class ShootEmDown {
       if (bullet.y < 0) bullet.alive = false;
     });
 
+    if (invaders.length == 6) {
+      if (invaders.sprites[0].speed == 1) {
+        invaders.sprites.forEach((Sprite inv) {
+          inv.speed = inv.speed + 2;
+        });
+      }
+    }
+
     badBullets.sprites.forEach((Sprite bullet) {
       if (playerShip.detectCollision(bullet)) {
         playerShip.dying = true;
         playerShip.movement = Movements.none;
+
         bullet.alive = false;
         sounds.play('hurt');
         game.player.lives -= 1;
+        if (game.player.lives > -1) {
+          querySelector("#getReady").style.visibility = "visible";
+        }
         badBullets.reset();
       }
       if (bullet.y > 480) bullet.alive = false;
     });
+
     invaders.removeDead();
     goodBullets.removeDead();
     badBullets.removeDead();
-    print(invaders.length);
+
     if (playerShip.dying || !playerShip.alive) {
-      if (game.player.isReadyToRespawn()) {
+      if (game.player.lives < 0) {
+        querySelector("#gameOver").style.visibility = "visible";
+        game.stop();
+      } else if (game.player.isReadyToRespawn()) {
         playerShip
           ..dying = false
           ..alive = true;
         game.spriteGroup
             .add(playerShip); // SpriteGroup update removes dead sprites.
+        querySelector("#getReady").style.visibility = "hidden";
       }
     }
 
@@ -172,6 +191,7 @@ class ShootEmDown {
   /// Update the HTML page the the game status.
   void updateScorePanel(Player p1) {
     DivElement statusPanel = querySelector("#gameStatus");
-    statusPanel.innerHtml = "Score : ${p1.score} Lives ${p1.lives}";
+    int lives = max(p1.lives, 0);
+    statusPanel.innerHtml = "Score : ${p1.score} Lives ${lives}";
   }
 }

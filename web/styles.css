@@ -8,7 +8,36 @@ html, body {
     font-family: 'Play', sans-serif;
     background-color: #021308;
     color:#00ff00;
+    font-size:x-large;
 }
 h1{
     color: chartreuse;
+}
+
+#getReady{
+    position:absolute;
+    left:0;
+    right:0;
+    margin-left:auto;
+    margin-right:auto;
+    width:480px;
+    top:250px;
+    font-size: 70pt;
+    font-weight: bold;
+    visibility: hidden;
+    text-shadow: #9affb9 0.06em 0.06em 0.06em
+}
+
+#gameOver{
+    position:absolute;
+    left:0;
+    right:0;
+    margin-left:auto;
+    margin-right:auto;
+    width:480px;
+    top:250px;
+    font-size: 70pt;
+    font-weight: bold;
+    visibility: hidden;
+    text-shadow: #9affb9 0.06em 0.06em 0.06em
 }
