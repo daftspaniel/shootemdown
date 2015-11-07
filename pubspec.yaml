@@ -1,7 +1,7 @@
 name: 'shootemdown'
 version: 0.0.1
-description: An absolute bare-bones web app.
-#author: Your Name <email@example.com>
+description: A classic left right shooter with elements of Space Invaders, Galaxians and Centipede.
+author: Your Name <email@example.com>
 #homepage: https://www.example.com
 
 environment:

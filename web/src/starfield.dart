@@ -9,6 +9,7 @@ class MutablePoint {
 }
 
 class Starfield {
+
   int speed = 0;
   int count = 0;
   int x = 0;
@@ -22,13 +23,13 @@ class Starfield {
   Starfield(this.x, this.y, this.width, this.height, this.count, this.speed,
       this.surface) {
     stars = new List<MutablePoint>();
-    var now = new DateTime.now();
-    var rng = new Random(now.millisecondsSinceEpoch);
+    DateTime now = new DateTime.now();
+    Random rng = new Random(now.millisecondsSinceEpoch);
     while (this.count > stars.length) stars
         .add(new MutablePoint(rng.nextInt(width), rng.nextInt(height)));
   }
 
-  draw() {
+  void draw() {
     String temp = surface.fillStyle;
     surface.fillStyle = 'white';
     for (MutablePoint star
@@ -37,7 +38,7 @@ class Starfield {
     update();
   }
 
-  update() {
+  void update() {
     stars.forEach((MutablePoint star) {
       star.x += speed;
       if (star.x > width) star.x = 0;

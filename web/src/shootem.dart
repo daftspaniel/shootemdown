@@ -7,45 +7,15 @@ import 'starfield.dart';
 class ShootEmDown {
   Game game = new Game("Shootemdown", '#Surface');
 
-  Sprite playerShip;
-  SpriteGroup invaders;
-  SpriteGroup goodBullets;
-  SpriteGroup badBullets;
+  final SpriteGroup invaders = new SpriteGroup();
+  final SpriteGroup goodBullets = new SpriteGroup();
+  final SpriteGroup badBullets = new SpriteGroup();
   final AudioBank sounds = new AudioBank();
   final _random = new Random();
+
+  Sprite playerShip;
   Starfield stars;
   Starfield starsMid;
-
-  /// Create a crowd of invaders.
-  buildMob() {
-    invaders = new SpriteGroup();
-    goodBullets = new SpriteGroup();
-    badBullets = new SpriteGroup();
-
-    Sprite inv;
-    for (int k = 0; k < 4; k++) {
-      for (int i = 0; i < 9; i++) {
-        if (k % 2 == 0) inv = game.createSprite("img/inv1.png", 48, 48);
-        else inv = game.createSprite("img/inv2.png", 48, 48);
-        inv.setDyingImage("img/hitinv1.png");
-        invaders.add(inv);
-
-        inv
-          ..position = new Point(10 + i * 50, k * 45)
-          ..movement = Movements.east
-          ..cyclesToDie = 100;
-      }
-    }
-  }
-
-  /// Reset player's [Sprite].
-  resetPlayer() {
-    playerShip
-      ..position = new Point(296, 401)
-      ..speed = 4
-      ..limits = new Rectangle(0, 380, 640, 100);
-    updateScorePanel(game.player);
-  }
 
   /// Game initialisation
   ShootEmDown() {
@@ -60,18 +30,46 @@ class ShootEmDown {
       ..player = new Player.withNotifications(updateScorePanel)
       ..player.sprite = playerShip;
 
-    setUpKeys();
-    resetPlayer();
-    game.customUpdate = update;
     stars = new Starfield(0, 0, 640, 480, 33, 2, game.renderer.canvas);
     starsMid = new Starfield(0, 0, 640, 480, 23, 3, game.renderer.canvas);
+    setUpKeys();
+    game.customUpdate = update;
     game.renderer.liveBackground.postCustomDraw = this.postCustomDraw;
-
-    // Level 1.
-    buildMob();
-
-    game.start();
+    start();
   }
+
+  /// Create a crowd of invaders.
+  buildMob() {
+
+    invaders.reset();
+    goodBullets.reset();
+    badBullets.reset();
+
+    Sprite inv;
+    for (int k = 0; k < 4; k++) {
+      for (int i = 0; i < 9; i++) {
+        if (k % 2 == 0) inv = game.createSprite("img/inv1.png", 48, 48);
+        else inv = game.createSprite("img/inv2.png", 48, 48);
+        inv.setDyingImage("img/hitinv1.png");
+        invaders.add(inv);
+
+        inv
+          ..position = new Point(10 + i * 50, k * 49)
+          ..movement = Movements.east
+          ..cyclesToDie = 100;
+      }
+    }
+  }
+
+  /// Reset player's [Sprite] to start or resume a level.
+  resetPlayer() {
+    playerShip
+      ..position = new Point(296, 401)
+      ..speed = 4
+      ..limits = new Rectangle(0, 380, 640, 100);
+    updateScorePanel(game.player);
+  }
+
 
   /// Update all sprites and check for collisions.
   void update() {
@@ -94,7 +92,7 @@ class ShootEmDown {
     goodBullets.sprites.forEach((Sprite bullet) {
       invaders.sprites.forEach((Sprite inv) {
         if (bullet.alive && inv.detectCollision(bullet)) {
-          //inv.alive = false;
+
           inv
             ..dying = true
             ..movement = Movements.north
@@ -124,9 +122,9 @@ class ShootEmDown {
         sounds.play('hurt');
         game.player.lives -= 1;
         if (game.player.lives > -1) {
-          querySelector("#getReady").style.visibility = "visible";
+          showGetReady();
         }
-        badBullets.reset();
+
       }
       if (bullet.y > 480) bullet.alive = false;
     });
@@ -137,7 +135,7 @@ class ShootEmDown {
 
     if (playerShip.dying || !playerShip.alive) {
       if (game.player.lives < 0) {
-        querySelector("#gameOver").style.visibility = "visible";
+        showGameOver();
         game.stop();
       } else if (game.player.isReadyToRespawn()) {
         playerShip
@@ -145,22 +143,41 @@ class ShootEmDown {
           ..alive = true;
         game.spriteGroup
             .add(playerShip); // SpriteGroup update removes dead sprites.
-        querySelector("#getReady").style.visibility = "hidden";
+        hideGetReady();
       }
     }
 
-    // Bad bullets;
     invaderFire();
   }
 
+  void showGetReady() {
+    hideGameOver();
+    querySelector("#getReady").style.visibility = "visible";
+  }
+
+  void hideGetReady() {
+    querySelector("#getReady").style.visibility = "hidden";
+  }
+
+  void showGameOver() {
+    hideGetReady();
+    querySelector("#gameOver").style.visibility = "visible";
+  }
+
+  void hideGameOver() {
+    querySelector("#gameOver").style.visibility = "hidden";
+  }
+
   /// Launch a bullet from the [Invaders]'s [Sprite].
-  invaderFire() {
+  void invaderFire() {
     if (playerShip.alive == false ||
         playerShip.dying == true ||
         invaders.length == 0 ||
         _random.nextInt(20) != 10) return;
+
     Sprite bad = game.createSprite("img/badbullet.png", 8, 8);
     badBullets.add(bad);
+
     int invaderID = _random.nextInt(invaders.length);
     bad
       ..position = new Point(invaders.sprites[invaderID].x + 24,
@@ -171,7 +188,13 @@ class ShootEmDown {
   }
 
   /// Launch a bullet from the [Player]'s [Sprite].
-  playerFire() {
+  void playerFire() {
+    if (game.player.lives < 0) {
+      game.player.lives = 1;
+      start();
+      return;
+    }
+
     if (playerShip.alive == false || playerShip.dying == true) return;
     Sprite b = game.createSprite("img/goodbullet.png", 8, 8);
     goodBullets.add(b);
@@ -180,6 +203,21 @@ class ShootEmDown {
       ..movement = Movements.north
       ..speed = 5;
     sounds.play('fire');
+  }
+
+  void start() {
+    resetPlayer();
+    game.spriteGroup.reset();
+    game.spriteGroup.add(playerShip);
+    playerShip.alive = true;
+    game.player.reset();
+    goodBullets.reset();
+
+    // Level 1.
+    buildMob();
+
+    hideGameOver();
+    game.start();
   }
 
   /// Set fire button.
@@ -200,7 +238,7 @@ class ShootEmDown {
     statusPanel.innerHtml = "Score : ${p1.score} Lives ${lives}";
   }
 
-  /// Draw the [Starfield].
+  /// Draw the [Starfield] layers.
   void postCustomDraw(CanvasRenderingContext2D canvas) {
     stars.draw();
     starsMid.draw();
