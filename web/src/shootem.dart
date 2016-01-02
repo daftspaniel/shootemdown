@@ -48,7 +48,8 @@ class ShootEmDown {
     Sprite inv;
     for (int k = 0; k < 4; k++) {
       for (int i = 0; i < 9; i++) {
-        if (k % 2 == 0) inv = game.createSprite("img/inv1.png", 48, 48);
+        if (k  == 0) inv = game.createSprite("img/inv1.png", 48, 48);
+        else if (k  == 1) inv = game.createSprite("img/inv3.png", 48, 48);
         else inv = game.createSprite("img/inv2.png", 48, 48);
         inv.setDyingImage("img/hitinv1.png");
         invaders.add(inv);
