@@ -2,7 +2,7 @@ library shootemdown.levelbuilder;
 
 class LevelBuilder
 {
-  SpriteGroup badGuys;
+  //SpriteGroup badGuys;
   LevelBuilder(){}
 
   buildLevel(int i)

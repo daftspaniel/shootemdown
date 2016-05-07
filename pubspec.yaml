@@ -1,7 +1,7 @@
 name: 'shootemdown'
 version: 0.0.1
 description: A classic left right shooter with elements of Space Invaders, Galaxians and Centipede.
-author: Your Name <email@example.com>
+author: Davy Mitchell <daftspaniel@gmail.com>
 #homepage: https://www.example.com
 
 environment:
@@ -10,8 +10,6 @@ environment:
 dependencies:
   browser: '>=0.10.0 <0.11.0'
   dart_to_js_script_rewriter: '^0.1.0'
-  simplegamelib:
-    path: "../simplegamelib"
-  #simplegamelib: '^0.0.5'
+  simplegamelib: '^0.0.13'
 transformers:
 - dart_to_js_script_rewriter

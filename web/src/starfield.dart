@@ -1,4 +1,3 @@
-import 'package:simplegamelib/simplegamelib.dart';
 import 'dart:html';
 import 'dart:math';
 
