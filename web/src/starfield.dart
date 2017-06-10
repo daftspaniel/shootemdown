@@ -18,13 +18,12 @@ class Starfield {
   int height = 480;
   int direction = 0;
 
-  Random rng = new Random();
-  List<MutablePoint> stars = new List<MutablePoint>();
+  final Random rng = new Random();
+  final List<MutablePoint> stars = new List<MutablePoint>();
   CanvasRenderingContext2D surface;
 
   Starfield(this.x, this.y, this.width, this.height, this.count, this.speed,
       this.surface) {
-
     while (this.count > stars.length) stars
         .add(new MutablePoint(rng.nextInt(width), rng.nextInt(height)));
   }

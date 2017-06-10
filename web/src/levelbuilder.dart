@@ -9,11 +9,13 @@ class LevelBuilder {
 
   Game game;
   bool reverse = false;
+  int level = 1;
 
   LevelBuilder() {}
 
-  buildLevel(int i) {
-    if (i == 1) {
+  buildLevel() {
+    if (level == 1) {
+      reverse = true;
       invaders.reset();
       Sprite inv;
       for (int k = 0; k < 4; k++) {
@@ -28,7 +30,8 @@ class LevelBuilder {
         }
       }
     }
-    else if (i == 2) {
+    else if (level == 2) {
+      reverse = false;
       invaders.reset();
       Sprite inv;
 
@@ -43,21 +46,17 @@ class LevelBuilder {
       for (int i = 0; i < 9; i++) {
         inv = createInvader(2);
         inv
-          ..setPosition((10 + i * 50), -149)
+          ..setPosition(10 + i * 50, -149)
           ..movement = Movements.south;
-      }
 
-      for (int i = 0; i < 9; i++) {
         inv = createInvader(3);
         inv
-          ..setPosition(10 + i * 55, -299)
+          ..setPosition(15 + i * 50, -299)
           ..movement = Movements.south;
-      }
 
-      for (int i = 0; i < 9; i++) {
         inv = createInvader(_random.nextInt(2) + 1);
         inv
-          ..setPosition(10 + i * 55, -349)
+          ..setPosition(20 + i * 50, -349)
           ..movement = Movements.south;
       }
     }
