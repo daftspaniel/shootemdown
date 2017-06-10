@@ -2,15 +2,17 @@ import 'package:simplegamelib/simplegamelib.dart';
 import 'dart:html';
 import 'dart:math';
 import 'starfield.dart';
+import 'levelbuilder.dart';
 
 /// Core class for left-right shooter game.
 class ShootEmDown {
-  Game game = new Game("Shootemdown", '#Surface');
+  final Game game = new Game("Shootemdown", '#Surface');
 
   final SpriteGroup invaders = new SpriteGroup();
   final SpriteGroup goodBullets = new SpriteGroup();
   final SpriteGroup badBullets = new SpriteGroup();
   final AudioBank sounds = new AudioBank();
+  final LevelBuilder levelBuilder = new LevelBuilder();
   final _random = new Random();
 
   Sprite playerShip;
@@ -19,6 +21,8 @@ class ShootEmDown {
 
   /// Game initialisation
   ShootEmDown() {
+    levelBuilder.invaders = invaders;
+    levelBuilder.game = game;
     playerShip = game.createSprite("img/ship.png", 24, 20);
     playerShip.setDyingImage("img/hitship.png");
 
@@ -30,57 +34,68 @@ class ShootEmDown {
       ..player = new Player.withNotifications(updateScorePanel)
       ..player.sprite = playerShip;
 
-    stars = new Starfield(0, 0, 640, 480, 33, 2, game.renderer.canvas);
-    starsMid = new Starfield(0, 0, 640, 480, 23, 3, game.renderer.canvas);
+    createStarfields();
     setUpKeys();
-    game.customUpdate = update;
-    game.renderer.liveBackground.postCustomDraw = this.postCustomDraw;
+    game
+      ..customUpdate = update
+      ..renderer.liveBackground.postCustomDraw = this.postCustomDraw;
     start();
   }
 
-  /// Create a crowd of invaders.
-  buildMob() {
+  void createStarfields() {
+    stars = new Starfield(
+        0,
+        0,
+        640,
+        480,
+        33,
+        2,
+        game.renderer.canvas);
+    starsMid = new Starfield(
+        0,
+        0,
+        640,
+        480,
+        23,
+        3,
+        game.renderer.canvas);
+  }
 
-    invaders.reset();
+  /// Create a crowd of invaders.
+  void buildMob() {
     goodBullets.reset();
     badBullets.reset();
-
-    Sprite inv;
-    for (int k = 0; k < 4; k++) {
-      for (int i = 0; i < 9; i++) {
-        if (k  == 0) inv = game.createSprite("img/inv1.png", 48, 48);
-        else if (k  == 1) inv = game.createSprite("img/inv3.png", 48, 48);
-        else inv = game.createSprite("img/inv2.png", 48, 48);
-        inv.setDyingImage("img/hitinv1.png");
-        invaders.add(inv);
-
-        inv
-          ..position = new Point(10 + i * 50, k * 49)
-          ..movement = Movements.east
-          ..cyclesToDie = 100;
-      }
-    }
+    levelBuilder.buildLevel(2);
   }
 
   /// Reset player's [Sprite] to start or resume a level.
-  resetPlayer() {
+  void resetPlayer() {
     playerShip
-      ..position = new Point(296, 401)
+      ..setPosition(296, 401)
       ..speed = 4
       ..limits = new Rectangle(0, 380, 640, 100);
     updateScorePanel(game.player);
   }
 
-
   /// Update all sprites and check for collisions.
   void update() {
     // Invader LtoR movement.
-    bool reverse = false;
+
     invaders.sprites.forEach((Sprite inv) {
-      if (inv.x > 600 || inv.x < 0) reverse = true;
-      if (inv.y < -50) inv.alive = false;
+     // if (inv.x > 600 || inv.x < 0) reverse = true;
+      if (inv.y < -500) inv.alive = false;
     });
-    if (reverse) {
+
+    invaders.sprites.forEach((Sprite inv) {
+
+      if (inv.y > 480) {
+        inv.y = inv.y - 555;
+        if (inv.speed == 1) inv.speed = 2;
+        inv.x = 640 - inv.x;
+      }
+    });
+
+    if (levelBuilder.reverse) {
       invaders.sprites.forEach((Sprite inv) {
         if (!inv.dying) {
           inv.movement = reverseDirection(inv.movement);
@@ -93,7 +108,6 @@ class ShootEmDown {
     goodBullets.sprites.forEach((Sprite bullet) {
       invaders.sprites.forEach((Sprite inv) {
         if (bullet.alive && inv.detectCollision(bullet)) {
-
           inv
             ..dying = true
             ..movement = Movements.north
@@ -125,7 +139,6 @@ class ShootEmDown {
         if (game.player.lives > -1) {
           showGetReady();
         }
-
       }
       if (bullet.y > 480) bullet.alive = false;
     });

@@ -4,6 +4,7 @@ import 'dart:math';
 class MutablePoint {
   int x;
   int y;
+
   MutablePoint(this.x, this.y);
 }
 
@@ -15,15 +16,15 @@ class Starfield {
   int y = 0;
   int width = 640;
   int height = 480;
+  int direction = 0;
 
-  List<MutablePoint> stars;
+  Random rng = new Random();
+  List<MutablePoint> stars = new List<MutablePoint>();
   CanvasRenderingContext2D surface;
 
   Starfield(this.x, this.y, this.width, this.height, this.count, this.speed,
       this.surface) {
-    stars = new List<MutablePoint>();
-    DateTime now = new DateTime.now();
-    Random rng = new Random(now.millisecondsSinceEpoch);
+
     while (this.count > stars.length) stars
         .add(new MutablePoint(rng.nextInt(width), rng.nextInt(height)));
   }
@@ -31,17 +32,28 @@ class Starfield {
   void draw() {
     String temp = surface.fillStyle;
     surface.fillStyle = 'white';
-    for (MutablePoint star
-        in stars) this.surface.fillRect(star.x, star.y, 1, 1);
+    for (MutablePoint star in stars)
+      this.surface.fillRect(star.x, star.y, 1, 1);
     surface.fillStyle = temp;
     update();
+    if (rng.nextInt(1000) == 1) direction = 1 - direction;
   }
 
   void update() {
-    stars.forEach((MutablePoint star) {
-      star.x += speed;
-      if (star.x > width) star.x = 0;
-      else if (star.x < 0) star.x = width;
-    });
+    if (direction == 1) {
+      stars.forEach((MutablePoint star) {
+        star.x += speed;
+        if (star.x > width)
+          star.x = 0;
+        else if (star.x < 0) star.x = width;
+      });
+    } else {
+      stars.forEach((MutablePoint star) {
+        star.y += speed;
+        if (star.y > height)
+          star.y = 0;
+        else if (star.y < 0) star.y = height;
+      });
+    }
   }
 }
