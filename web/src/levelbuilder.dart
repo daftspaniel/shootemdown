@@ -2,14 +2,13 @@ import 'package:simplegamelib/simplegamelib.dart';
 import 'dart:math';
 
 class LevelBuilder {
-
   final _random = new Random();
 
   SpriteGroup invaders;
 
   Game game;
   bool reverse = false;
-  int level = 1;
+  int level = 4;
 
   LevelBuilder() {}
 
@@ -29,8 +28,7 @@ class LevelBuilder {
             ..movement = Movements.east;
         }
       }
-    }
-    else if (level == 2) {
+    } else if (level == 2) {
       reverse = false;
       invaders.reset();
       Sprite inv;
@@ -59,6 +57,30 @@ class LevelBuilder {
           ..setPosition(20 + i * 50, -349)
           ..movement = Movements.south;
       }
+    } else if (level == 3) {
+      reverse = false;
+      invaders.reset();
+      Sprite inv;
+
+      for (int i = 0; i < 9; i++) {
+        inv = createInvader();
+
+        inv
+          ..setPosition((10 - i) * -50, -400 + (i * 50))
+          ..movement = Movements.southeast;
+      }
+    } else if (level == 4) {
+      reverse = false;
+      invaders.reset();
+      Sprite inv;
+
+      for (int i = 0; i < 9; i++) {
+        inv = createInvader();
+
+        inv
+          ..setPosition(_random.nextInt(10) *30, -400 + (_random.nextInt(10) * i * 50))
+          ..movement = Movements.south;
+      }
     }
   }
 
@@ -71,8 +93,5 @@ class LevelBuilder {
     return inv;
   }
 
-  void resetLevel() {
-
-  }
-
+  void resetLevel() {}
 }

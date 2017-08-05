@@ -64,6 +64,7 @@ class ShootEmDown {
 
   /// Create a crowd of invaders.
   void progressToNextLevel() {
+    print(levelBuilder.level);
     levelBuilder.level++;
     goodBullets.reset();
     badBullets.reset();
@@ -138,7 +139,6 @@ class ShootEmDown {
     badBullets.removeDead();
 
     if (invaders.length == 0) {
-      levelBuilder.level++;
       progressToNextLevel();
     }
   }
